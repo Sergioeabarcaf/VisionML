@@ -61,6 +61,10 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         self.previewLayer?.frame = self.view.bounds
     }
     
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        <#code#>
+    }
+    
     //funcion para clasificar la imagen
     func classify(_ image: CGImage, completion: @escaping([VNClassificationObservation])-> Void){
         
@@ -78,12 +82,23 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         
     }
     
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        <#code#>
-    }
-    
     @IBAction func takePhoto() {
+        self.photoOutput?.capturePhoto(with: AVCapturePhotoSettings(), delegate: self)
+        self.captureButton.isHidden = true
+        self.retakeButton.isHidden = false
         
+        let alert = UIAlertController(title: "Prosesando", message: "Favor de esperar", preferredStyle: .alert)
+        
+        alert.view.tintColor = UIColor.black
+        
+        let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 10, y: (alert.view.bounds.maxY / 2), width: 50, height: 50))
+        
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        activityIndicator.startAnimating()
+        alert.view.addSubview(activityIndicator)
+        
+        present(alert,animated: true)
     }
     
     @IBAction func retake() {

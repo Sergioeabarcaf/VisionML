@@ -62,7 +62,22 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        <#code#>
+        if let error = error {
+            print("ERROR: \(error)")
+        }
+        
+        let photoData = photo.fileDataRepresentation()
+        let dataProvider = CGDataProvider(data: photoData! as CFData)
+        
+        let cgImageRef = CGImage(jpegDataProviderSource: dataProvider!, decode: nil, shouldInterpolate: true, intent: .defaultIntent)
+        
+        classify(cgImageRef!, completion: {data in
+            self.pushData(data: data)
+        })
+        
+        let image = UIImage(data: photoData!)
+        self.tempImageView.image = image
+        self.tempImageView.isHidden = false
     }
     
     //funcion para clasificar la imagen

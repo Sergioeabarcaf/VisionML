@@ -82,6 +82,28 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     
     //funcion para clasificar la imagen
     func classify(_ image: CGImage, completion: @escaping([VNClassificationObservation])-> Void){
+        //Se debe pasar por un hilo distinto para no bloquear la APP
+        DispatchQueue.global(qos: .background).async {
+            guard let coreModel = try? VNCoreMLModel(for: Inceptionv3().model) else {return}
+            
+            let request = VNCoreMLRequest(model: coreModel, completionHandler: { (request, error) in
+                guard var results = request.results as? [VNClassificationObservation] else { fatalError("Fallo al procesar los datos")}
+                
+                results = results.filter({ $0.confidence > 0.01 })
+                
+                DispatchQueue.main.async {
+                    completion(results)
+                }
+            })
+            
+            let handler = VNImageRequestHandler(cgImage: image)
+            
+            do{
+                try handler.perform([request])
+            } catch{
+                print("Error: \(error)")
+            }
+        }
         
     }
     

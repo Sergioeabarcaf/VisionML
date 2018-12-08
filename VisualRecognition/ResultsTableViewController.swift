@@ -13,18 +13,33 @@ class ResultsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.tableView.estimatedRowHeight = 85.0
+        self.tableView.rowHeight = UITableViewAutomaticDimension
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return self.clasifications.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellDefault", for: indexPath)
+        let cell: ResultTableViewCell
+        
+        if indexPath.item == 0{
+            cell = tableView.dequeueReusableCell(withIdentifier: "cellLarge", for: indexPath) as! ResultTableViewCell
+        } else{
+            cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath) as! ResultTableViewCell
+        }
+        
+        let score = self.clasifications[indexPath.item].confidence
+        
+        cell.label.text = self.clasifications[indexPath.item].identifier
+        cell.progress.progress = CGFloat(score)
+        cell.score.text = "\(String(format: "%.2f", score*100))%"
+        
         return cell
     }
 }

@@ -108,15 +108,27 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     }
     
     func dismissResults(){
-        
+        getTableController { (tablecontroller, drawer) in
+            drawer.setDrawerPosition(position: .closed, animated: true)
+            tablecontroller.clasifications = []
+        }
     }
     
     func pushData(data: [VNClassificationObservation]){
-        
+        getTableController{ (tablecontroller, drawer) in
+            tablecontroller.clasifications = data
+            self.dismiss(animated: true, completion: nil)
+            drawer.setDrawerPosition(position: .partiallyRevealed, animated: true)
+        }
     }
     
     func getTableController(run: (_ tableController: ResultsTableViewController, _ drawer: PulleyViewController)->Void){
-        
+        if let drawer = self.parent as? PulleyViewController {
+            if let tablecontroller = drawer.drawerContentViewController as? ResultsTableViewController {
+                run(tablecontroller, drawer)
+                tablecontroller.tableView.reloadData()
+            }
+        }
     }
     
     @IBAction func takePhoto() {
@@ -124,11 +136,11 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         self.captureButton.isHidden = true
         self.retakeButton.isHidden = false
         
-        let alert = UIAlertController(title: "Prosesando", message: "Favor de esperar", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Procesando", message: "Favor de esperar", preferredStyle: .alert)
         
         alert.view.tintColor = UIColor.black
         
-        let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 10, y: (alert.view.bounds.maxY / 2), width: 50, height: 50))
+        let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 10, y: 10, width: 50, height: 50))
         
         activityIndicator.hidesWhenStopped = true
         activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
